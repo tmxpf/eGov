@@ -27,7 +27,7 @@ public interface EgovBBSManageService {
 	 * @param Board
 	 * @exception Exception Exception
 	 */
-	public void deleteBoardArticle(Board Board)
+	public void deleteBoardArticle(BoardVO BoardVO)
 	  throws Exception;
 
 	/**

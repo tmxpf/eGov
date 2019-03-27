@@ -1,6 +1,7 @@
 package egovframework.let.cop.bbs.service;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -119,6 +120,9 @@ public class Board implements Serializable {
 	 * 게시 시작일
 	 */
 	private String ntceBgndeView = "";
+
+	
+
 
 	/**
 	 * atchFileId attribute를 리턴한다.

@@ -54,15 +54,20 @@ public class EgovBBSManageServiceImpl extends EgovAbstractServiceImpl implements
      *
      * @see egovframework.let.cop.bbs.brd.service.EgovBBSManageService#deleteBoardArticle(egovframework.let.cop.bbs.brd.service.Board)
      */
-    public void deleteBoardArticle(Board board) throws Exception {
+    public void deleteBoardArticle(BoardVO boardVO) throws Exception {
 	FileVO fvo = new FileVO();
 
-	fvo.setAtchFileId(board.getAtchFileId());
+	fvo.setAtchFileId(boardVO.getAtchFileId());
 
-	board.setNttSj("이 글은 작성자에 의해서 삭제되었습니다.");
+	boardVO.setNttSj("이 글은 작성자에 의해서 삭제되었습니다.");
 
-	bbsMngDAO.deleteBoardArticle(board);
-
+	if(!boardVO.getChk_delete().isEmpty()) {
+		for(int i = 0; i < boardVO.getChk_delete().size(); i++) {
+			boardVO.setNttId(Long.parseLong(boardVO.getChk_delete().get(i)));
+			bbsMngDAO.deleteBoardArticle(boardVO);
+		}
+	}
+	
 	if (!"".equals(fvo.getAtchFileId()) || fvo.getAtchFileId() != null) {
 	    fileService.deleteAllFileInf(fvo);
 	}

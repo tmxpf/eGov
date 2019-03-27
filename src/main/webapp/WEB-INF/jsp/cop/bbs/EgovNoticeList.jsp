@@ -24,16 +24,17 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
 <meta http-equiv="content-language" content="ko">
 <script
-  src="http://code.jquery.com/jquery-3.3.1.slim.min.js"
-  integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
+  src="http://code.jquery.com/jquery-3.3.1.js"
+  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
   crossorigin="anonymous"></script>
 <link href="<c:url value='/'/>css/common.css" rel="stylesheet" type="text/css" >
 <c:if test="${anonymous == 'true'}"><c:set var="prefix" value="/anonymous"/></c:if>
 <script type="text/javascript" src="<c:url value='/js/EgovBBSMng.js' />" ></script>
 <c:choose>
 <c:when test="${preview == 'true'}">
+
 <script type="text/javascript">
-<!--
+
     function press(event) {
     }
 
@@ -45,12 +46,27 @@
     
     function fn_egov_inqire_notice(nttId, bbsId) {      
     }
-//-->
+
 </script>
 </c:when>
 <c:otherwise>
-<script type="text/javascript">
-<!--
+<script>
+
+	function ajaxBoardList(pageNo) {
+		
+		$('input[name=pageIndex]').val(pageNo);
+		
+		$.ajax({
+		    url : "/cop/bbs/ajaxselectBoardList.do",
+		    dataType : "html",
+		    type : "post", 
+		    data : $('#frm').serialize(),
+		    success : function(result) {
+		        $(".default_tablestyle").html(result);
+		    }
+		});
+	}
+
     function press(event) {
         if (event.keyCode==13) {
             fn_egov_select_noticeList('1');
@@ -63,10 +79,20 @@
     }
     
     function fn_egov_select_noticeList(pageNo) {
-        document.frm.pageIndex.value = pageNo;
+    	/* document.frm.pageIndex.value = pageNo;
         document.frm.action = "<c:url value='/cop/bbs${prefix}/selectBoardList.do'/>";
-        document.frm.submit();  
+        document.frm.submit(); */
+
+		
+		ajaxBoardList(pageNo);
     }
+    
+    $(document).ready(function() {
+    	
+    	var pageNo = $('input[name=pageIndex]').val();
+    	
+    	ajaxBoardList(pageNo);
+    });
     
     function fn_egov_inqire_notice(nttId, bbsId) {
         document.subForm.nttId.value = nttId;
@@ -74,21 +100,57 @@
         document.subForm.action = "<c:url value='/cop/bbs${prefix}/selectBoardArticle.do'/>";
         document.subForm.submit();          
     }
-//-->
-</script>
-
-<script>
-
-	$.ajax({
-	    url : "로딩할 페이지 URL, ex)/common/list.jsp",
-	    dataType : "html",
-	    type : "post",  // post 또는 get
-	    data : { a:"값1", b:"값2"},   // 호출할 url 에 있는 페이지로 넘길 파라메터
-	    success : function(result){
-	        $("#div 아이디").html(result);
-	    }
-	});
-
+    
+    function chk_change() {
+    	var chk_size = document.getElementsByName("delete_check").length;
+    	var chk_count = 0;
+    	
+    	for(var i = 0; i < chk_size; i++) {
+    		if(document.getElementsByName("delete_check")[i].checked)
+    			chk_count++;
+    	}
+    	
+    	if(chk_count == chk_size)
+    		document.getElementById("all_chk").checked = true;
+    	else
+    		document.getElementById("all_chk").checked = false;
+    }
+    
+    function check_all() {
+    	var chk_size = document.getElementsByName("delete_check").length;
+    	
+    	for(i = 0; i < chk_size; i++) {
+    		if(document.getElementById("all_chk").checked == true)
+    			document.getElementsByName("delete_check")[i].checked = true;
+    		else
+    			document.getElementsByName("delete_check")[i].checked = false;
+    	}
+    }
+    
+    function fn_egov_delete_noticeList() {
+    	var size = document.getElementsByName("delete_check").length;
+    	var delete_check = [];
+    	
+    	for(var i = 0; i < size; i++) {
+    		if(document.getElementsByName("delete_check")[i].checked == true) {
+    			delete_check.push(document.getElementsByName("delete_check")[i].value);
+    		}
+    	}
+    	
+    	var test = $('#frm').serialize() + "&chk_delete=" + delete_check;
+    	
+    	$.ajax({
+		    url : "/cop/bbs/ajaxdeleteBoardList.do",
+		    dataType : "html",
+		    type : "post", 
+		    data : test,
+		    success : function(result) {
+		        $(".default_tablestyle").html(result);
+		    }
+		});
+    	
+    }
+    
 </script>
 
 </c:otherwise>
@@ -128,16 +190,17 @@
                         </ul>
                     </div>
                 </div>
+                
                 <!-- 검색 필드 박스 시작 -->
                 <div id="search_field">
                     <div id="search_field_loc"><h2><strong><c:out value='${brdMstrVO.bbsNm}'/></strong></h2></div>
-					<form name="frm" action ="<c:url value='/cop/bbs${prefix}/selectBoardList.do'/>" method="post">
+					<form id="frm" action ="<c:url value='/cop/bbs${prefix}/selectBoardList.do'/>" method="post">
 						<input type="hidden" name="bbsId" value="<c:out value='${boardVO.bbsId}'/>" />
 						<input type="hidden" name="nttId"  value="0" />
 						<input type="hidden" name="bbsTyCode" value="<c:out value='${brdMstrVO.bbsTyCode}'/>" />
 						<input type="hidden" name="bbsAttrbCode" value="<c:out value='${brdMstrVO.bbsAttrbCode}'/>" />
 						<input type="hidden" name="authFlag" value="<c:out value='${brdMstrVO.authFlag}'/>" />
-						<input name="pageIndex" type="hidden" value="<c:out value='${searchVO.pageIndex}'/>"/>
+						<input type="hidden" name="pageIndex" value="<c:out value='${searchVO.pageIndex}'/>"/>
                         <input type="submit" value="실행" onclick="fn_egov_select_noticeList('1'); return false;" id="invisible" class="invisible" />
                         
                         <fieldset><legend>조건정보 영역</legend>
@@ -166,7 +229,7 @@
                                 </li>
                                 <li>
 	                                <div class="buttons" style="position:absolute;left:950px;top:182px;">
-	                                     <a href="#LINK" onclick="javascript:fn_egov_select_noticeList('1'); return false;">삭제 </a>
+	                                     <a href="#LINK" onclick="javascript:fn_egov_delete_noticeList(); return false;">삭제 </a>
 	                                </div>
                                 </li>
                                 <li>
@@ -186,8 +249,10 @@
                 <div id="page_info"><div id="page_info_align"></div></div>                    
                  -->
                 <!-- table add start -->
+                
                 <div class="default_tablestyle">
-                    <table summary="번호, 제목, 게시시작일, 게시종료일, 작성자, 작성일, 조회수   입니다" cellpadding="0" cellspacing="0">
+                
+                    <%-- <table summary="번호, 제목, 게시시작일, 게시종료일, 작성자, 작성일, 조회수   입니다" cellpadding="0" cellspacing="0">
                     <caption>게시물 목록</caption>
                     <colgroup>
                     <col width="10%">
@@ -283,14 +348,17 @@
 				     </c:if>  
                     </tbody>
                     </table>
+                    
+                	<!-- 페이지 네비게이션 시작 -->
+	                <div id="paging_div">
+	                    <ul class="paging_align">
+	                        <ui:pagination paginationInfo="${paginationInfo}" type="image" jsFunction="fn_egov_select_noticeList" />    
+	                    </ul>
+	                </div>
+	                <!-- //페이지 네비게이션 끝 --> --%>
+	                
                 </div>
-                <!-- 페이지 네비게이션 시작 -->
-                <div id="paging_div">
-                    <ul class="paging_align">
-                        <ui:pagination paginationInfo="${paginationInfo}" type="image" jsFunction="fn_egov_select_noticeList" />    
-                    </ul>
-                </div>
-                <!-- //페이지 네비게이션 끝 -->  
+                 
             </div>
             <!-- //content 끝 -->    
         </div>

@@ -167,7 +167,7 @@
 				<![CDATA[	b.USER_NM LIKE CONCAT ('%', #searchWrd#,'%') 		]]>
 			</isEqual>			
 		<![CDATA[			
-			ORDER BY a.SORT_ORDR DESC, NTT_NO ASC
+			ORDER BY a.SORT_ORDR DESC, a.NTT_ID ASC
 			LIMIT #recordCountPerPage# OFFSET #firstIndex#
 		]]>				
 	</select>	
@@ -239,7 +239,7 @@
  		]]>
  	</update>
 
- 	<update id="BBSManageDAO.deleteBoardArticle" parameterClass="Board">
+ 	<update id="BBSManageDAO.deleteBoardArticle" parameterClass="BoardVO">
  		<![CDATA[
 			UPDATE LETTNBBS SET 
 				NTT_SJ = #nttSj#,

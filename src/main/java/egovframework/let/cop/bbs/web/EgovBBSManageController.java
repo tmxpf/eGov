@@ -26,7 +26,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -118,6 +121,71 @@ public class EgovBBSManageController {
         return ret;
     }
 
+    @RequestMapping("/cop/bbs/ajaxselectBoardList.do")
+    public String ajaxselectBoardArticle(@ModelAttribute("searchVO") BoardVO boardVO, ModelMap model, boolean urlCompare) throws Exception {
+    	LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+
+    	boardVO.setBbsId(boardVO.getBbsId());
+    	boardVO.setBbsNm(boardVO.getBbsNm());	
+
+    	BoardMasterVO vo = new BoardMasterVO();
+
+    	vo.setBbsId(boardVO.getBbsId());
+    	vo.setUniqId(user.getUniqId());
+
+    	BoardMasterVO master = bbsAttrbService.selectBBSMasterInf(vo);
+
+    	//-------------------------------
+    	// 방명록이면 방명록 URL로 forward
+    	//-------------------------------
+    	/*if (master.getBbsTyCode().equals("BBST04")) {
+    	    return "forward:/cop/bbs/selectGuestList.do";
+    	}*/
+    	////-----------------------------
+
+//    	boardVO.setPageUnit(propertyService.getInt("pageUnit"));
+//    	boardVO.setPageSize(propertyService.getInt("pageSize"));
+    	
+    	boardVO.setPageUnit(boardVO.getPageSize());	//board list 개수제한
+//    	boardVO.setPageSize(boardVO.getListAmount());
+
+    	PaginationInfo paginationInfo = new PaginationInfo();
+
+    	paginationInfo.setCurrentPageNo(boardVO.getPageIndex());
+    	paginationInfo.setRecordCountPerPage(boardVO.getPageUnit());
+    	paginationInfo.setPageSize(boardVO.getPageSize());
+
+    	boardVO.setFirstIndex(paginationInfo.getFirstRecordIndex());
+    	boardVO.setLastIndex(paginationInfo.getLastRecordIndex());
+    	boardVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
+
+    	Map<String, Object> map = bbsMngService.selectBoardArticles(boardVO, vo.getBbsAttrbCode());
+    	int totCnt = Integer.parseInt((String)map.get("resultCnt"));
+
+    	paginationInfo.setTotalRecordCount(totCnt);
+
+    	//-------------------------------
+    	// 기본 BBS template 지정
+    	//-------------------------------
+    	if (master.getTmplatCours() == null || master.getTmplatCours().equals("")) {
+    	    master.setTmplatCours("/css/egovframework/cop/bbs/egovBaseTemplate.css");
+    	}
+    	////-----------------------------
+
+    	model.addAttribute("resultList", map.get("resultList"));
+    	model.addAttribute("resultCnt", map.get("resultCnt"));
+    	model.addAttribute("boardVO", boardVO);
+    	model.addAttribute("brdMstrVO", master);
+    	model.addAttribute("paginationInfo", paginationInfo);
+    	
+    	
+    	if(urlCompare) {
+    		return "cop/bbs/EgovNoticeList";
+    	} else {
+    		return "cop/bbs/eGovBoardSimpleList";
+    	}
+    }
+    
     /**
      * 게시물에 대한 목록을 조회한다.
      *
@@ -127,12 +195,13 @@ public class EgovBBSManageController {
      * @return
      * @throws Exception
      */
+    
     @RequestMapping("/cop/bbs/selectBoardList.do")
     public String selectBoardArticles(@ModelAttribute("searchVO") BoardVO boardVO, ModelMap model) throws Exception {
 	LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
 
 	boardVO.setBbsId(boardVO.getBbsId());
-	boardVO.setBbsNm(boardVO.getBbsNm());
+	boardVO.setBbsNm(boardVO.getBbsNm());	
 
 	BoardMasterVO vo = new BoardMasterVO();
 
@@ -186,79 +255,6 @@ public class EgovBBSManageController {
 
 	return "cop/bbs/EgovNoticeList";
     }
-
-    
-    
-    
-    /**
-     * 게시물에 대한 목록을 조회한다.
-     *
-     * @param boardVO
-     * @param sessionVO
-     * @param model
-     * @return
-     * @throws Exception
-     */
-    @RequestMapping("/cop/bbs/selectBoardList.do")
-    public String selectBoardArticles2222222(@ModelAttribute("searchVO") BoardVO boardVO, ModelMap model) throws Exception {
-	LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
-
-	boardVO.setBbsId(boardVO.getBbsId());
-	boardVO.setBbsNm(boardVO.getBbsNm());
-
-	BoardMasterVO vo = new BoardMasterVO();
-
-	vo.setBbsId(boardVO.getBbsId());
-	vo.setUniqId(user.getUniqId());
-
-	BoardMasterVO master = bbsAttrbService.selectBBSMasterInf(vo);
-
-	//-------------------------------
-	// 방명록이면 방명록 URL로 forward
-	//-------------------------------
-	if (master.getBbsTyCode().equals("BBST04")) {
-	    return "forward:/cop/bbs/selectGuestList.do";
-	}
-	////-----------------------------
-
-//	boardVO.setPageUnit(propertyService.getInt("pageUnit"));
-//	boardVO.setPageSize(propertyService.getInt("pageSize"));
-	
-	boardVO.setPageUnit(boardVO.getPageSize());	//board list 개수제한
-//	boardVO.setPageSize(boardVO.getListAmount());
-
-	PaginationInfo paginationInfo = new PaginationInfo();
-
-	paginationInfo.setCurrentPageNo(boardVO.getPageIndex());
-	paginationInfo.setRecordCountPerPage(boardVO.getPageUnit());
-	paginationInfo.setPageSize(boardVO.getPageSize());
-
-	boardVO.setFirstIndex(paginationInfo.getFirstRecordIndex());
-	boardVO.setLastIndex(paginationInfo.getLastRecordIndex());
-	boardVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
-
-	Map<String, Object> map = bbsMngService.selectBoardArticles(boardVO, vo.getBbsAttrbCode());
-	int totCnt = Integer.parseInt((String)map.get("resultCnt"));
-
-	paginationInfo.setTotalRecordCount(totCnt);
-
-	//-------------------------------
-	// 기본 BBS template 지정
-	//-------------------------------
-	if (master.getTmplatCours() == null || master.getTmplatCours().equals("")) {
-	    master.setTmplatCours("/css/egovframework/cop/bbs/egovBaseTemplate.css");
-	}
-	////-----------------------------
-
-	model.addAttribute("resultList", map.get("resultList"));
-	model.addAttribute("resultCnt", map.get("resultCnt"));
-	model.addAttribute("boardVO", boardVO);
-	model.addAttribute("brdMstrVO", master);
-	model.addAttribute("paginationInfo", paginationInfo);
-
-	return "cop/bbs/EgovNoticeList";
-    }
-    
     
     
     /**
@@ -683,6 +679,33 @@ public class EgovBBSManageController {
 	return "forward:/cop/bbs/selectBoardList.do";
     }
 
+    
+    @RequestMapping("/cop/bbs/ajaxdeleteBoardList.do")
+    public String ajaxdeleteBoardList(@ModelAttribute("searchVO") BoardVO boardVO, @ModelAttribute("board") Board board,
+	    @ModelAttribute("bdMstr") BoardMaster bdMstr, ModelMap model/*, @ModelAttribute(value="delete_check[]") List<String> delete_check*/) throws Exception {
+
+    	// 사용자권한 처리
+    	if(!EgovUserDetailsHelper.isAuthenticated()) {
+    		model.addAttribute("message", egovMessageSource.getMessage("fail.common.login"));
+        	return "cmm/uat/uia/EgovLoginUsr";
+    	}
+
+	LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+	Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+	if (isAuthenticated) {
+	    board.setLastUpdusrId(user.getUniqId());
+
+	    /*bbsMngService.deleteBoardArticle(board);*/
+	    bbsMngService.deleteBoardArticle(boardVO);
+	}
+
+	/*return "redirect:/cop/bbs/previewBoardList.do";*/
+	return "forward:/cop/bbs/ajaxselectBoardList.do";
+	/*return "redirect:/cop/bbs/ajaxselectBoardList.do";*/
+    }
+    
+    
     /**
      * 게시물에 대한 내용을 삭제한다.
      *
@@ -709,7 +732,7 @@ public class EgovBBSManageController {
 	if (isAuthenticated) {
 	    board.setLastUpdusrId(user.getUniqId());
 
-	    bbsMngService.deleteBoardArticle(board);
+	    /*bbsMngService.deleteBoardArticle(board);*/
 	}
 
 	return "forward:/cop/bbs/selectBoardList.do";
