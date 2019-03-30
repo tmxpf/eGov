@@ -46,6 +46,8 @@
         <li class="righttop_bgleft">&nbsp;</li>
         <li class="righttop_bgmiddle"><a href="<c:url value='/uat/uia/egovLoginUsr.do'/>">로그인</a></li>
         <li class="righttop_bgright">&nbsp;</li>
+        <li class="righttop_bgmiddle"><a href="<c:url value='/cmm/main/egovSignUp.do'/>">회원가입</a></li>
+        <li class="righttop_bgright">&nbsp;</li>
     </ul>
     <% }else { %>
     <c:set var="loginName" value="<%= loginVO.getName()%>"/>

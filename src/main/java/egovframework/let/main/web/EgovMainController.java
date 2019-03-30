@@ -3,6 +3,7 @@ package egovframework.let.main.web;
 import java.util.Map;
 
 import egovframework.com.cmm.ComDefaultVO;
+import egovframework.com.cmm.LoginVO;
 import egovframework.let.cop.bbs.service.BoardVO;
 import egovframework.let.cop.bbs.service.EgovBBSManageService;
 
@@ -10,11 +11,14 @@ import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 /**
@@ -94,5 +98,36 @@ public class EgovMainController {
 
 		return "main/EgovMainView";
 	}
-
+	
+	
+	/**
+	 * 회원가입(약관동의)
+	 */
+	@RequestMapping(value = "/cmm/main/egovSignUp.do")
+	public String singUp(HttpServletRequest request, HttpServletResponse response, ModelMap model) throws Exception {
+		return "cmm/uat/uia/EgovSingUp";
+	}
+	
+	/**
+	 * 회원가입
+	 */
+	@RequestMapping(value = "/cmm/main/egovSignUp_2.do")
+	public String singUp_2(HttpServletRequest request, HttpServletResponse response, ModelMap model) throws Exception {
+		return "cmm/uat/uia/EgovSingUpFinal";
+	}
+	
+	/**
+	 * 아이디 중복확인.
+	 * @return String
+	 * @exception Exception
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/cmm/main/idcheck.do")
+	public boolean idCheck(@RequestParam("idcheck") String idcheck, HttpServletRequest request, ModelMap model) throws Exception {
+		String EMPLYR_ID = idcheck;
+		
+		
+		
+		return true;
+	}
 }

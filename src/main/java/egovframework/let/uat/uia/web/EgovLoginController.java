@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
@@ -65,7 +66,15 @@ public class EgovLoginController {
 	public String loginUsrView(@ModelAttribute("loginVO") LoginVO loginVO, HttpServletRequest request, HttpServletResponse response, ModelMap model) throws Exception {
 		return "cmm/uat/uia/EgovLoginUsr";
 	}
-
+	
+	/**
+	 * 회원가입 화면으로 분기
+	 */
+	/*@RequestMapping(value = "/cmm/main/egovSignUp.do")
+	public String singUp(@ModelAttribute("loginVO") LoginVO loginVO, HttpServletRequest request, HttpServletResponse response, ModelMap model) throws Exception {
+		return "cmm/uat/uia/EgovSingUp";
+	}*/
+	
 	/**
 	 * 일반 로그인을 처리한다
 	 * @param vo - 아이디, 비밀번호가 담긴 LoginVO
@@ -125,5 +134,16 @@ public class EgovLoginController {
 
 		return "forward:/cmm/main/mainPage.do";
 	}
-
+	
+	/**
+	 * 아이디 중복확인.
+	 * @return String
+	 * @exception Exception
+	 */
+	@RequestMapping(value = "/uat/uia/idcheck.do")
+	public boolean idCheck(@RequestParam("idcheck") String idcheck, HttpServletRequest request, ModelMap model) throws Exception {
+		String test = idcheck;
+		
+		return true;
+	}
 }
