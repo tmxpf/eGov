@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CmmUse">
+
+	<typeAlias  alias="MemberVO" type="egovframework.let.cop.com.service.MemberVO"/>
+	
+	<resultMap id="SignUpVO" class="egovframework.let.cop.com.service.MemberVO">
+		<result property="id"    			column="ID"   				columnIndex="1"/>
+	</resultMap>
+	
+	<resultMap id="getMemberPw" class="egovframework.let.cop.com.service.MemberVO">
+		<result property="pw"    			column="PW"   				columnIndex="1"/>
+	</resultMap>
+
+	<insert id="insertMember" parameterClass="MemberVO">
+	<![CDATA[ 
+ 	    INSERT INTO myemployee (MB_NAME, SEX, DATE_OF_BIRTH_1, DATE_OF_BIRTH_2, ID, PW, EMAIL, EMAIL_DNS, TEL_PHON, ADDRESS, DETAIL_ADDRESS, IMAGE_FILE, IMAGE_PATH, FILE_NAME, FILE_SIZE, EXTENTION)
+        VALUES (#mbname#, #sex#, #dateOfBirth_1#, #dateOfBirth_2#, #id#, HEX(AES_ENCRYPT(#pw#, '512')), #email#, #emaildns#, #phone#, #address#, #detailaddress#, #imagePath#, #imagePath#, #fileName#, #fileSize#, #extention#)
+	]]>
+    </insert> 
+    
+    <select id="selectMemberId" parameterClass="MemberVO" resultMap="SignUpVO">
+    <![CDATA[ 
+    	SELECT ID FROM myemployee WHERE ID = #id#
+    ]]>
+    </select>
+    
+    <select id="selectMemberPw" parameterClass="MemberVO" resultMap="getMemberPw">
+    <![CDATA[ 
+    	select cast(aes_decrypt(unhex(PW), '512') as char(200)) as pw FROM myemployee WHERE ID = #id#
+    ]]>
+    </select>
+
+</sqlMap>            

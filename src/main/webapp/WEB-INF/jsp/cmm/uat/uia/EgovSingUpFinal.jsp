@@ -17,7 +17,8 @@
 </head>
 <body>
 
-<form name="write_form_member" method="post">
+<form name="write_form_member" action="/cmm/main/egovSingUpFinal.do" method="post" enctype="multipart/form-data">
+   <!-- <input type="hidden" id="imageFile" name="imageFile" value=""/> -->
    <table width="940" style="padding:5px 0 5px 0; ">
       <tr height="2" bgcolor="#FFC8C3"><td colspan="2"></td></tr>
       <tr>
@@ -41,12 +42,12 @@
        <tr>
          <th>아이디</th>
          <td>
-         <input type="text" id="ID" maxlength="10" onkeyup="IDFunc();"> <input type="button" value="아이디 중복확인" onClick="idCheck();">
+         <input type="text" id="id" name="id" maxlength="10" onkeyup="IDFunc();"> <input type="button" value="아이디 중복확인" onClick="idCheck();">
          </td>
        </tr>
        <tr>
          <th>비밀번호</th>
-         <td><input type="password" id="pw" maxlength="10" onkeyup="isSame();">&nbsp;&nbsp; ※ 영문/숫자포함 6자 이상</td>
+         <td><input type="password" id="pw" name="pw" maxlength="10" onkeyup="isSame();">&nbsp;&nbsp; ※ 영문/숫자포함 6자 이상</td>
        </tr>
        <tr>
          <th>비밀번호 확인</th>
@@ -55,9 +56,9 @@
         <tr>
           <th>이메일</th>
           <td>
-            <input type='text' id="email">@
-            <input type='text' id="email_dns">
-              <select id="emailaddr" onChange="checkemailaddy();">
+            <input type='text' id="email" name="email">@
+            <input type='text' id="email_dns" name="emaildns">
+              <select id="emailaddr" name="emailaddr" onChange="checkemailaddy();">
                  <option value="1">직접입력</option>
                  <option value="daum.net">daum.net</option>
                  <option value="empal.com">empal.com</option>
@@ -71,16 +72,16 @@
          </tr>
          <tr>
           <th>핸드폰 번호</th>
-           <td><input type="text"name="tel_phon" onkeyup="onlyNumber();" maxlength="3"> -
-               <input type="text" name="tel_phon" onkeyup="onlyNumber();" maxlength="4"> -
-               <input type="text" name="tel_phon" onkeyup="onlyNumber();" maxlength="4">
+           <td><input type="text"name="phone" onkeyup="onlyNumber();" maxlength="3"> -
+               <input type="text" name="phone" onkeyup="onlyNumber();" maxlength="4"> -
+               <input type="text" name="phone" onkeyup="onlyNumber();" maxlength="4">
            </td>
           </tr>
          <tr>
            <th>주소</th>
            <td>
-             <input type="text" id="address">&nbsp;&nbsp; <input type="button" value="주소찾기" onClick="address_add();">
-             <input type="text" id="detail_address" style="display:none;" placeholder="(상세주소)">
+             <input type="text" id="address" name="address" >&nbsp;&nbsp; <input type="button" value="주소찾기" onClick="address_add();">
+             <input type="text" id="detail_address" name="detailaddress" style="display:none;" placeholder="(상세주소)">
              <div id="layer" style="display:none;position:fixed;overflow:hidden;z-index:1;-webkit-overflow-scrolling:touch;">
              	<img src="//t1.daumcdn.net/postcode/resource/images/close.png" id="btnCloseLayer" style="cursor:pointer;position:absolute;right:-3px;top:-3px;z-index:1" onclick="closeDaumPostcode()" alt="닫기 버튼">
              </div>
@@ -90,26 +91,24 @@
 	         <tr>
 	           <th> 프로필 사진 </th>
 	           <td>
-	           	 <input type='file' id="imgInput" />
-   				 <img id="image_section" src="#"/>
+	           	 <input type='file' id="imgInput" name="imgInput" accept="image/*"/>
+   				 <img id="image" id="image" src="#"/>
    				 <div id="image_val" style="display:none;">
-	   				 <p id="path"></p>
-	   				 <p id="fileName"></p>
-	   				 <p id="fileSize"></p>
-	   				 <p id="extension"></p>
+	   				 <p>경로 : <input type='text' id="path" name="path" readonly></p>
+	   				 <p>파일이름 : <input type='text' id="fileName" name="fileName" readonly></p>
+	   				 <p>사이즈 : <input type='text' id="fileSize" name="fileSize" readonly></p>
+	   				 <p>확장자 : <input type='text' id="extention" name="extention" readonly></p>
    				 </div>
 	           </td>
 	         </tr>
            <tr height="2" bgcolor="#FFC8C3"><td colspan="2"></td></tr>
            <tr>
              <td colspan="2" align="center">
-               <input type="submit" value="회원가입">
+               <input type="submit" value="회원가입" onClick="return final_submit();">
                <input type="reset" value="취소">
             </td>
            </tr>
            </table>
-          </td>
-          </tr>
           </form>
 
 </body>
@@ -120,7 +119,7 @@
 var regexp_Name = /[^가-힣a-zA-Z]/g;
 var regexp_onlyNumber = /[^0-9]/g;
 var regexp_ID = /[^0-9a-zA-Z]/g;
-
+var id_check = false;
 
 /* 이름 인증 */
 function name_change() {
@@ -147,19 +146,31 @@ function onlyNumber() {
 /* 아이디 인증 */
 function IDFunc() {
 	validate(regexp_ID);
+	id_check = false;
 }
 
 /* 아이디 중복확인 */
  function idCheck() {
-	var id = document.getElementById("ID").value;
+	var id = document.getElementById("id").value;
 	
 	$.ajax({
 	    url : "/cmm/main/idcheck.do",
-	    dataType : "json",
 	    type : "post", 
-	    data : {idcheck : id},
+	    data : {"id" : id},
 	    success : function(result) {
-	        var test = result;
+	        if(result === "") {
+	        	alert("인증이 완료되었습니다.");
+	        	id_check = true;
+	        }
+	        else {
+	        	document.getElementById("id").value = "";
+	        	alert("이미 사용중인 ID입니다.");
+	        	id_check = false;
+	        }
+	        	
+	    },
+	    error : function(error) {
+	    	alert("ERROR : " + error);
 	    }
 	});
 }
@@ -205,6 +216,59 @@ function checkemailaddy() {
 function validate(regexp) {
 	var str = event.target.value.replace(regexp, '');
 	event.target.value = str;
+}
+
+/* 최종 회원가입 */
+function final_submit() {
+	var name = document.getElementsByName("mbname")[0].value;
+	var id = document.getElementById("id").value;
+	var pw = document.getElementById("pw").value;
+	var pw_chk = document.getElementById("pw_chk").value;
+	
+	var pw_compare = (function() {
+		if(pw === pw_chk)
+			return true;
+		else
+			return false;
+	})();
+	
+	var dateOfBirth_1 = document.getElementsByName("dateOfBirth")[0].value;
+	var dateOfBirth_2 = document.getElementsByName("dateOfBirth")[1].value;
+	
+	if(name.length == 0){
+        alert("이름을 입력해 주세요"); 
+        $("#mbname").focus();
+        return false;
+    }
+	
+	if(id.length == 0){
+        alert("ID를 입력해 주세요"); 
+        $("#id").focus();
+        return false;
+    }
+	
+	if(id_check === false) {
+		alert("ID중복확인을 해주세요"); 
+        $("#id").focus();
+		return false;
+	}
+	
+	if(pw.length == 0 || pw_chk.length == 0 || pw_compare === false){
+        alert("패스워드를 확인 해 주세요"); 
+        $("#pw").focus();
+        return false;
+    }
+	
+	if(dateOfBirth_1.length == 0 || dateOfBirth_2.length == 0){
+        alert("주민등록 번호를 입력 하세요"); 
+        $("#dateOfBirth_1").focus();
+        return false;
+    }
+	
+	if(confirm("회원가입을 하시겠습니까?")){
+        alert("회원가입을 축하합니다");
+        return true;
+    }
 }
 
 </script>
@@ -283,20 +347,31 @@ function readURL(input) {
 	 
     if (input.files && input.files[0]) {
         var reader = new FileReader();
+        var check_file_type = ['jpg','gif','png','jpeg','bmp'];
  		var extention = input.files[0].type.split('/');
      	
-     	document.getElementById('image_val').style.display = 'block';
-     	
-     	$('#path').text("경로 : " + input.value);
-     	$('#fileName').text("파일이름 : " + input.files[0].name);
-     	$('#fileSize').text("사이즈 : " + input.files[0].size + "byte");
-     	$('#extension').text("확장자 : " + extention[1]);
-     	
-        reader.onload = function (e) {
-            $('#image_section').attr('src', e.target.result);
-        }
- 
-        reader.readAsDataURL(input.files[0]);
+ 		for(var i = 0; i < check_file_type.length; i++) {
+	 		if(check_file_type[i] == extention[1].toLowerCase()) {
+		     	document.getElementById('image_val').style.display = 'block';
+		     	
+		     	$('#path').val(input.value);
+		     	$('#fileName').val(input.files[0].name);
+		     	$('#fileSize').val(input.files[0].size + "byte");
+		     	$('#extention').val(extention[1]);
+		     	
+		        reader.onload = function (e) {
+		            $('#image').attr('src', e.target.result);
+		            /* $('#imageFile').val(e.target.result); */
+		        }
+		 
+		        reader.readAsDataURL(input.files[0]);
+		        
+		        return;
+	 		}
+ 		}
+ 		
+ 		alert("이미지 파일이 아닙니다.");
+ 		input.value = "";
     }
 }
 

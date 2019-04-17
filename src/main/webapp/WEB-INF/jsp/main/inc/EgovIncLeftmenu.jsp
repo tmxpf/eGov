@@ -59,6 +59,7 @@ String menuNo = ((String)session.getAttribute("menuNo")!=null)?(String)session.g
 				<li class="dept02"><a href="javascript:fn_main_headPageAction('43','cop/bbs/selectBoardList.do?bbsId=BBSMSTR_AAAAAAAAAAAA')">공지사항</a></li>
 				<li class="dept02"><a href="javascript:fn_main_headPageAction('44','cop/bbs/selectBoardList.do?bbsId=BBSMSTR_BBBBBBBBBBBB')">사이트갤러리</a></li>
 				<li class="dept02"><a href="javascript:fn_main_headPageAction('45','cop/bbs/ajaxselectBoardList.do?bbsId=BBSMSTR_DDDDDDDDDDDD&urlCompare=true')">임시게시판</a></li>
+				<li class="dept02"><a href="javascript:fn_main_headPageAction('46','cop/bbs/selectGalBoard.do?bbsId=BBSMSTR_EEEEEEEEEEEE&urlCompare=true')">갤러리 게시판</a></li>
 			</ul> 
 		</li>
 		<% } %>

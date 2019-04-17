@@ -1,4 +1,5 @@
 package egovframework.let.cop.bbs.web;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,14 @@ import egovframework.rte.fdl.property.EgovPropertyService;
 import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -816,5 +824,129 @@ public class EgovBBSManageController {
 	model.addAttribute("preview", "true");
 
 	return "cop/bbs/EgovNoticeList";
+    }
+    
+    
+    /**
+     * 게시판의 게시물 Excel 다운로드
+     *
+     * @param boardVO
+     * @param sessionVO
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+	@RequestMapping("/cop/bbs/execlDownload.do")
+    public void execlDownload(@ModelAttribute("searchVO") BoardVO boardVO, HttpServletResponse response, ModelMap model) throws Exception {
+    	
+    	XSSFWorkbook objWorkBook = new XSSFWorkbook();
+        XSSFSheet objSheet = null;
+        XSSFRow objRow = null;
+        XSSFCell objCell = null; // 셀 생성
+
+        // 제목 폰트
+        XSSFFont font = objWorkBook.createFont();
+        font.setFontHeightInPoints((short) 9);
+        //font.setBoldweight((short) font.BOLDWEIGHT_BOLD);
+        font.setBold(true);
+        font.setFontName("맑은고딕");
+        
+        // 제목 스타일에 폰트 적용, 정렬
+        XSSFCellStyle styleHd = objWorkBook.createCellStyle(); // 제목 스타일
+        styleHd.setFont(font);
+//        styleHd.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+//        styleHd.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+
+        objSheet = objWorkBook.createSheet("첫번째 시트"); // 워크시트 생성
+        
+        //게시판 자료 가져오기
+    	String dummyData = "";
+    	Map<String, Object> map = bbsMngService.selectBoardArticles(boardVO, dummyData);
+    	
+    	// 행으로 제작을 하네
+        // 1행
+        objRow = objSheet.createRow(0);
+        objRow.setHeight((short) 0x150);
+
+        objCell = objRow.createCell(0);
+        objCell.setCellValue("번호");
+        objCell.setCellStyle(styleHd);
+
+        objCell = objRow.createCell(1);
+        objCell.setCellValue("제목");
+        objCell.setCellStyle(styleHd);
+
+        objCell = objRow.createCell(2);
+        objCell.setCellValue("작성자");
+        objCell.setCellStyle(styleHd);
+
+        objCell = objRow.createCell(3);
+        objCell.setCellValue("작성일");
+        objCell.setCellStyle(styleHd);
+        
+        List<BoardVO> list = (List<BoardVO>)map.get("resultList");
+        
+        int index = 1;
+        for (BoardVO vo : list) {
+        	
+          objRow = objSheet.createRow(index);
+          objRow.setHeight((short) 0x150);
+
+          objCell = objRow.createCell(0);
+          /*objCell.setCellValue((String)map.get("custId"));*/
+          objCell.setCellValue(vo.getNttId());
+          objCell.setCellStyle(styleHd);
+
+          objCell = objRow.createCell(1);
+          /*objCell.setCellValue((String)map.get("custName"));*/
+          objCell.setCellValue((String)vo.getNttSj());
+          objCell.setCellStyle(styleHd);
+
+          objCell = objRow.createCell(2);
+          /*objCell.setCellValue((String)map.get("custAge"));*/
+          objCell.setCellValue((String)vo.getFrstRegisterNm());
+          objCell.setCellStyle(styleHd);
+
+          objCell = objRow.createCell(3);
+          /*objCell.setCellValue((String)map.get("custEmail"));*/
+          objCell.setCellValue((String)vo.getFrstRegisterPnttm());
+          objCell.setCellStyle(styleHd);
+          index++;
+          
+        }
+        
+        for (int i = 0; i < list.size(); i++) {
+            objSheet.autoSizeColumn(i);
+        }
+        
+        response.setContentType("Application/Msexcel");
+        response.setHeader("Content-Disposition", "attachment;filename=MyFusionText.xlsx");
+
+        //엑셀 출력
+        /*objWorkBook.write(response.getOutputStream());
+        objWorkBook.close();*/
+        
+        OutputStream fileOut = response.getOutputStream();
+        objWorkBook.write(fileOut);
+        fileOut.close();
+
+        response.getOutputStream().flush();
+        response.getOutputStream().close();
+    }
+    
+    
+    /**
+     * REST API 구성(SELECT)
+     *
+     * @param boardVO
+     * @param sessionVO
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/getBoardData.do")
+    public void getBoardData(@ModelAttribute("searchVO") BoardVO boardVO, HttpServletResponse response, ModelMap model) throws Exception {
+    	
     }
 }

@@ -39,6 +39,10 @@
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
 
+	<!-- <listener>
+        <listener-class>egovframework.let.main.web.VisitSessionListener</listener-class>
+    </listener> -->
+
 	<servlet>
 		<servlet-name>action</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>

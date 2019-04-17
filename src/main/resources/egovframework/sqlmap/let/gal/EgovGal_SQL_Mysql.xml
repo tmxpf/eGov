@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Board">
+
+	<typeAlias  alias="EgovGalVO" type="egovframework.let.cop.gal.web.EgovGalVO"/>
+
+	<!-- <resultMap id="galVO" class="egovframework.let.cop.gal.web.EgovGalVO">
+		<result property="seq" column="seq" columnIndex="1"/>
+		<result property="title" column="board_title" columnIndex="2"/>
+		<result property="content" column="board_content" columnIndex="3"/>
+		<result property="imgPath" column="img_path" columnIndex="4"/>
+		<result property="imgSize" column="img_size" columnIndex="5"/>
+		<result property="imgName" column="img_name" columnIndex="6"/>
+		<result property="imgType" column="img_type" columnIndex="7"/>
+	</resultMap> -->
+
+	<insert id="EgovGALDAO.insertImgBoard" parameterClass="EgovGalVO">
+		<![CDATA[
+			INSERT INTO img_board(board_title, board_content, img_path, img_size, img_name, img_type, date1) values(#title#, #content#, #imgPath#, #imgSize#, #imgName#, #imgType#, NOW());
+ 		]]>
+	</insert>
+
+</sqlMap>

@@ -151,6 +151,24 @@
     	
     }
     
+    function excelDownload() {
+    	/* document.frm.action = '/cop/bbs/execlDownload.do'; */
+        
+    	document.getElementById('frm2').submit();
+    	
+    	/* $.ajax({
+		    url : "/cop/bbs/execlDownload.do",
+		    type : "post", 
+		    data : $('#frm').serialize(),
+		    success : function(result) {
+		    	alert("Excel 다운로드 성공");
+		    },
+		    error : function(result) {
+		    	alert("error : " + result);
+		    }
+		}); */
+    }
+    
 </script>
 
 </c:otherwise>
@@ -194,6 +212,18 @@
                 <!-- 검색 필드 박스 시작 -->
                 <div id="search_field">
                     <div id="search_field_loc"><h2><strong><c:out value='${brdMstrVO.bbsNm}'/></strong></h2></div>
+                    <!-- 테스트용 -->
+                    
+                    <form id="frm2" action ="<c:url value='/cop/bbs/execlDownload.do'/>" method="post">
+                    	<input type="hidden" name="bbsId" value="<c:out value='${boardVO.bbsId}'/>" />
+						<input type="hidden" name="nttId"  value="0" />
+						<input type="hidden" name="bbsTyCode" value="<c:out value='${brdMstrVO.bbsTyCode}'/>" />
+						<input type="hidden" name="bbsAttrbCode" value="<c:out value='${brdMstrVO.bbsAttrbCode}'/>" />
+						<input type="hidden" name="authFlag" value="<c:out value='${brdMstrVO.authFlag}'/>" />
+						<input type="hidden" name="pageIndex" value="<c:out value='${searchVO.pageIndex}'/>"/>
+						
+                    </form>
+                    
 					<form id="frm" action ="<c:url value='/cop/bbs${prefix}/selectBoardList.do'/>" method="post">
 						<input type="hidden" name="bbsId" value="<c:out value='${boardVO.bbsId}'/>" />
 						<input type="hidden" name="nttId"  value="0" />
@@ -215,6 +245,9 @@
                                 </li>
                                 <li>
                                     <input name="searchWrd" type="text" size="35" value='<c:out value="${searchVO.searchWrd}"/>' maxlength="35" onkeypress="press(event);" title="검색어 입력"> 
+                                </li>
+                                <li>
+		                            <input type="button" value="엑셀 다운로드" onclick="excelDownload();"/>
                                 </li>
                                 <li>
                                     <div class="buttons" style="position:absolute;left:870px;top:182px;">

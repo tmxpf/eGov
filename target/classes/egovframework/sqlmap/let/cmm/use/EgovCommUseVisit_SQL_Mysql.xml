@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CmmUse">
+
+	<insert id="insertTotalCount">
+	<![CDATA[ 
+ 	    INSERT INTO VISIT (V_DATE) VALUES (NOW())
+	]]>
+    </insert>
+    
+    <select id="selectTotalCount">
+    <![CDATA[ 
+    	SELECT COUNT(*) AS TotalCnt FROM VISIT
+    ]]>
+    </select>
+
+	<select id="selectTodayCount">
+    <![CDATA[ 
+    	SELECT COUNT(*) AS TodayCnt FROM VISIT WHERE FORMAT(V_DATE, 'YYYY-MM-DD') = FORMAT(now(), 'YYYY-MM-DD')
+    ]]>
+    </select>
+
+</sqlMap>
